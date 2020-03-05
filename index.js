@@ -1,11 +1,10 @@
 //path for js files is ./Develop/lib/
 const inquirer = require("inquirer");
-
-const render = require("./Develop/lib/htmlRenderer");
 const Manager = require("./Develop/lib/Manager");
 const Engineer = require("./Develop/lib/Engineer");
 const Intern = require("./Develop/lib/Intern");
 const Employee = require("./Develop/lib/Employee");
+const render = require("./Develop/lib/htmlRenderer");
 
 const teamMembers = [];
 
@@ -14,11 +13,12 @@ function addMember() {
         {
             type: "list",
             name: "type",
-            message: "Which type of team member would you like to add?",
+            message: "Which team member would you like to add?",
             choices: [
+                "Mananger",
                 "Engineer",
+                "Employee",
                 "Intern",
-                "I don't want to add any more team members"
             ]
 
         }
