@@ -1,160 +1,151 @@
-//path for js files is ./Develop/lib/
-const inquirer = require("inquirer");
 const Manager = require("./Develop/lib/Manager");
 const Engineer = require("./Develop/lib/Engineer");
 const Intern = require("./Develop/lib/Intern");
-const Employee = require("./Develop/lib/Employee");
-const render = require("./Develop/lib/htmlRenderer");
+const inquirer = require("inquirer");
+const path = require("path");
 
-const teamMembers = [];
+let teamArray = [];
 
-function addMember() {
-    inquirer.prompt([
-        {
-            type: "list",
-            name: "type",
-            message: "Which team member would you like to add?",
-            choices: [
-                "Mananger",
-                "Engineer",
-                "Employee",
-                "Intern",
-            ]
+function addEmployee() {
+    inquirer.prompt([{
+        type: "list",
+        name: "type",
+        message: "What employee would you like to add?",
+        choices: [
+            "Manager",
+            "Engineer",
+            "Employee",
+            "Intern",
+        ]
 
-        }
-    ]).then(function(answer) {
-        if(answer.type === "Engineer") {
+    }]).then(function (answer) {
+        if (answer.type === "Engineer") {
             createEngineer();
-        }
-        else if (answer.type === "Intern") {
+        } else if (answer.type === "Intern") {
             createIntern();
-        }
-        else {
-            render(teamMembers);
+        } else if (answer.type === "Manager") {
+            createManager();
+        } else if (answer.type === "Employee") {
+            createEmployee();
+        } else {
+            render(teamArray);
         }
 
     })
+};
+
+const questions = [{
+        type: "input",
+        message: "What is your team manager's name?",
+        name: "managerName"
+    },
+    {
+        type: "input",
+        message: "What is your manager's ID number?",
+        name: "managerId"
+    },
+    {
+        type: "input",
+        message: "What is your manager's email address?",
+        name: "managerEmail"
+    },
+    {
+        type: "number",
+        message: "What is this person's office number?",
+        name: "managerOffice"
+    }
+];
+
+const generalQuestions = [{
+        type: "input",
+        message: "What is this employee's name?",
+        name: "employeeName"
+    },
+    {
+        type: "input",
+        message: "What is the employee's ID number?",
+        name: "employeeId"
+    },
+    {
+        type: "input",
+        message: "What is the employee's email address?",
+        name: "employeeEmail"
+    },
+    {
+        type: "list",
+        message: "What is the type of employee?",
+        name: "employeeType",
+        choices: ["Intern", "Engineer"]
+    }
+];
+
+const managerQuesion = [{
+    type: "number",
+    message: "What is this employee's office phone number?",
+    name: "managerOffice"
+}];
+const engineerQuestion = [{
+    type: "input",
+    message: "What is this engineer's github username?",
+    name: "engineerGithub"
+}];
+const internQuestion = [{
+    type: "input",
+    message: "What school did/does this intern attend?",
+    name: "internSchool"
+}];
+
+const continueQuestion = [{
+    type: "confirm",
+    message: "Do you want to add another employee?",
+    name: "continue"
+}]
+
+function continuePrompt() {
+    inquirer
+        .prompt({
+            type: "confirm",
+            message: "Do you want to add another employee?",
+            name: "continue"
+        })
+        .then((results) => {
+            if (results.continue) {
+                addEmployee()
+            } else {
+                console.log(addEmployee)
+                let html = render(addEmployee)
+            }
+        })
+};
+
+function addEmployee() {
+    inquirer.prompt(generalQuestions)
+        .then(answers => {
+            if (answers.employeeType === "Intern") {
+                inquirer.prompt(internQ)
+                    .then(oneAnswer => {
+                        const intern = new Intern(answers.employeeName, answers.employeeId, answers.employeeEmail, oneAnswer.internSchool);
+                        addEmployee.push(intern);
+                        continuePrompt();
+                    })
+            } else {
+                inquirer.prompt(engineerQ)
+                    .then(oneAnswer => {
+                        const engineer = new Engineer(answers.employeeName, answers.employeeId, answers.employeeEmail, oneAnswer.engineerGithub);
+                        addEmployee.push(engineer);
+                        continuePrompt();
+                    })
+            }
+        })
 }
 
-function createManager () {
-    inquirer.prompt([
-        {
-            type: "input",
-            name: "name",
-            message: "What is your manager's name?"
-        },
-        {
-            type: "input",
-            name: "id",
-            message: "What is your manager's id?"
-        },
-        {
-            type: "input",
-            name: "email",
-            message: "What is your manager's email?"
-        },
-        {
-            type: "input",
-            name: "office",
-            message: "What is your manager's office number?"
-        }
-
-    ]).then(function (answers) {
-        const manager = new Manager(answers.name, parseInt(answers.id), answers.email, parseInt(answers.office));
-        teamMembers.push(manager);
-        addMember();
-    });
+function init() {
+    inquirer
+        .prompt(questions)
+        .then((answers) => {
+            const manager = new Manager(answers.managerName, answers.managerId, answers.managerEmail, answers.managerOffice);
+            addEmployee.push(manager);
+            continuePrompt();
+        });
 }
-
-function createEngineer () {
-    inquirer.prompt([
-        {
-            type: "input",
-            name: "name",
-            message: "What is your engineer's name?"
-        },
-        {
-            type: "input",
-            name: "id",
-            message: "What is your engineer's id?"
-        },
-        {
-            type: "input",
-            name: "email",
-            message: "What is your engineer's email?"
-        },
-        {
-            type: "input",
-            name: "github",
-            message: "What is your engineer's github?"
-        }
-
-    ]).then(function (answers) {
-        const engineer = new Engineer(answers.name, parseInt(answers.id), answers.email, answers.github);
-        teamMembers.push(engineer);
-        addMember();
-    });
-
-}
-
-function createIntern () {
-    inquirer.prompt([
-        {
-            type: "input",
-            name: "name",
-            message: "What is your intern's name?"
-        },
-        {
-            type: "input",
-            name: "id",
-            message: "What is your intern's id?"
-        },
-        {
-            type: "input",
-            name: "email",
-            message: "What is your intern's email?"
-        },
-        {
-            type: "input",
-            name: "school",
-            message: "What is your intern's school?"
-        }
-
-    ]).then(function (answers) {
-        const intern = new Intern(answers.name, parseInt(answers.id), answers.email, answers.school);
-        teamMembers.push(intern);
-        addMember();
-    });
-
-}
-function createEmployee () {
-    inquirer.prompt([
-        {
-            type: "input",
-            name: "name",
-            message: "What is your manager's name?"
-        },
-        {
-            type: "input",
-            name: "id",
-            message: "What is your manager's id?"
-        },
-        {
-            type: "input",
-            name: "email",
-            message: "What is your manager's email?"
-        },
-        {
-            type: "input",
-            name: "office",
-            message: "What is your manager's office number?"
-        }
-
-    ]).then(function (answers) {
-        const employee = new Employee(answers.name, parseInt(answers.id), answers.email, parseInt(answers.office));
-        teamMembers.push(employee);
-        addMember();
-    });
-}
-
-createManager();
+init();
