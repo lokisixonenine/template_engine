@@ -1,157 +1,209 @@
-const Manager = require("./Develop/lib/Manager");
+const Employee = require("./Develop/lib/Employee");
 const Engineer = require("./Develop/lib/Engineer");
 const Intern = require("./Develop/lib/Intern");
+const Manager = require("./Develop/lib/Manager");
 const inquirer = require("inquirer");
-const path = require("path");
 const fs = require("fs");
 
-const OUTPUT_DIR = path.resolve(__dirname, "output");
-const outputPath = path.join(OUTPUT_DIR, "team.html");
-
-const render = require("./Develop/lib/htmlRenderer");
-
-let teamArray = [];
-
-function addEmployee() {
-    inquirer.prompt([{
-        type: "list",
-        name: "type",
-        message: "What employee would you like to add?",
-        choices: [
-            "Manager",
-            "Engineer",
-            "Employee",
-            "Intern",
-        ]
-
-    }]).then(function (answer) {
-        if (answer.type === "Engineer") {
-            createEngineer();
-        } else if (answer.type === "Intern") {
-            createIntern();
-        } else if (answer.type === "Manager") {
-            createManager();
-        } else if (answer.type === "Employee") {
-            createEmployee();
-        } else {
-            render(teamArray);
-        }
-
-    })
-};
 
 const questions = [{
         type: "input",
-        message: "What is your team manager's name?",
-        name: "managerName"
+        name: "name",
+        message: "What is the Manager's name?"
     },
     {
         type: "input",
-        message: "What is your manager's ID number?",
-        name: "managerId"
+        message: "What the Managers's employee id?",
+        name: "id",
     },
     {
         type: "input",
-        message: "What is your manager's email address?",
-        name: "managerEmail"
+        message: "What is the Manager's email address?",
+        name: "email",
     },
     {
-        type: "number",
-        message: "What is this person's office number?",
-        name: "managerOffice"
+        type: "input",
+        message: "What is the Manager's office phone number?",
+        name: "officePhoneNumber",
+    },
+    {
+        type: "checkbox",
+        message: "What type of team member would you like to add?",
+        name: "member",
+        choices: ["engineer", "intern"]
     }
 ];
 
-const generalQuestions = [{
+const addEmployee = [{
         type: "input",
-        message: "What is this employee's name?",
-        name: "employeeName"
+        name: "name",
+        message: "What is the employee's name?"
     },
     {
         type: "input",
-        message: "What is the employee's ID number?",
-        name: "employeeId"
+        message: "What is the employee's employee id?",
+        name: "id",
     },
     {
         type: "input",
         message: "What is the employee's email address?",
-        name: "employeeEmail"
+        name: "email",
     },
     {
-        type: "list",
-        message: "What is the type of employee?",
-        name: "employeeType",
-        choices: ["Intern", "Engineer"]
+        type: "input",
+        message: "What is this employee's title?",
+        name: "role",
     }
 ];
 
-const managerQuesion = [{
-    type: "number",
-    message: "What is this employee's office phone number?",
-    name: "managerOffice"
-}];
-const engineerQuestion = [{
-    type: "input",
-    message: "What is this engineer's github username?",
-    name: "engineerGithub"
-}];
-const internQuestion = [{
-    type: "input",
-    message: "What school did/does this intern attend?",
-    name: "internSchool"
-}];
 
-const continueQuestion = [{
-    type: "confirm",
-    message: "Do you want to add another employee?",
-    name: "continue"
+const addEngineer = [{
+        type: "input",
+        name: "name",
+        message: "What is the engineer's name?"
+    },
+    {
+        type: "input",
+        message: "What is the engineer's employee id?",
+        name: "id",
+    },
+    {
+        type: "input",
+        message: "What is the engineer's email address?",
+        name: "email",
+    },
+    {
+        type: "input",
+        message: "What is the engineer's github username?",
+        name: "github",
+    }
+];
+
+const addIntern = [{
+        type: "input",
+        name: "name",
+        message: "What is the intern's name?"
+    },
+    {
+        type: "input",
+        message: "What is the intern's employee id?",
+        name: "id",
+    },
+    {
+        type: "input",
+        message: "What is the intern's email?",
+        name: "email",
+    },
+    {
+        type: "input",
+        message: "What school does the intern attend/What school did the intern attend?",
+        name: "school",
+    }
+];
+
+const addMoreMembers = [{
+    type: "checkbox",
+    message: "Add more members?",
+    name: "choice",
+    choices: ["true", "false"]
 }]
 
-function continuePrompt() {
-    inquirer
-        .prompt({
-            type: "confirm",
-            message: "Do you want to add another employee?",
-            name: "continue"
-        })
-        .then((results) => {
-            if (results.continue) {
-                addEmployee()
-            } else {
-                console.log(addEmployee)
-                let html = render(addEmployee)
-            }
-        })
-};
+const employeeType = [{
+    type: "checkbox",
+    message: "What type of team member would you like to add?",
+    name: "member1",
+    choices: ["engineer", "intern"]
+}]
 
-function addEmployee() {
-    inquirer.prompt(generalQuestions)
-        .then(answers => {
-            if (answers.employeeType === "Intern") {
-                inquirer.prompt(internQ)
-                    .then(oneAnswer => {
-                        const intern = new Intern(answers.employeeName, answers.employeeId, answers.employeeEmail, oneAnswer.internSchool);
-                        addEmployee.push(intern);
-                        continuePrompt();
-                    })
-            } else {
-                inquirer.prompt(engineerQ)
-                    .then(oneAnswer => {
-                        const engineer = new Engineer(answers.employeeName, answers.employeeId, answers.employeeEmail, oneAnswer.engineerGithub);
-                        addEmployee.push(engineer);
-                        continuePrompt();
-                    })
-            }
-        })
-}
+inquirer
+    .prompt(questions)
+    .then(function (user) {
 
-function init() {
-    inquirer
-        .prompt(questions)
-        .then((answers) => {
-            const manager = new Manager(answers.managerName, answers.managerId, answers.managerEmail, answers.managerOffice);
-            addEmployee.push(manager);
-            continuePrompt();
+        const templateMainFile = fs.readFileSync(`./Develop/templates/main.html`, {
+            encoding: 'utf8'
         });
+
+        const manager = new Manager(user.name, user.id, user.email, user.officePhoneNumber);
+
+        let team = renderHTML(manager);
+        let proceed = true;
+
+        AddDontAdd(proceed, user.member[0], team, templateMainFile);
+    })
+    .catch(err => console.log(err));
+
+function renderHTML(position) {
+    const templateFile = fs.readFileSync(`./Develop/templates/${position.getRole().toLowerCase()}.html`, {
+        encoding: 'utf8'
+    });
+    let temporaryFile = templateFile.replace('{{ name }}', position.name);
+    temporaryFile = temporaryFile.replace('{{ role }}', position.getRole());
+    temporaryFile = temporaryFile.replace('{{ id }}', position.id);
+    temporaryFile = temporaryFile.replace('{{ email }}', position.email);
+    temporaryFile = temporaryFile.replace('{{ email }}', position.email);
+
+    if (position.getRole().toLowerCase() === "engineer") {
+        temporaryFile = temporaryFile.replace('{{ github }}', position.github);
+        temporaryFile = temporaryFile.replace('{{ github }}', position.github);
+    } else if (position.getRole().toLowerCase() === "intern") {
+        temporaryFile = temporaryFile.replace('{{ school }}', position.school);
+    } else if (position.getRole().toLowerCase() === "manager") {
+        temporaryFile = temporaryFile.replace('{{ officePhoneNumber }}', position.officePhoneNumber);
+    }
+
+    return temporaryFile;
 }
-init();
+
+async function AddDontAdd(proceed, activeEmployee, team, templateMainFile) {
+    try {
+        do {
+            switch (activeEmployee) {
+
+                case "engineer":
+                    const engineer = await inquirer.prompt(addEngineer);
+                    console.log(engineer);
+
+                    let engineer1 = new Engineer(engineer.name, engineer.id, engineer.email, engineer.github);
+                    let engineer1card = renderHTML(engineer1);
+                    team = team + engineer1card
+                    console.log(team);
+                    let nextMember = await inquirer.prompt(addMoreMembers);
+                    console.log(nextMember);
+
+                    if (nextMember.choice[0] === "false") {
+                        proceed = false;
+                        console.log(proceed, "Adding member");
+                        let temporaryMainFile = templateMainFile.replace('{{ team }}', team);
+                        fs.writeFileSync("index.html", temporaryMainFile);
+                    } else if (nextMember.choice[0] === "true"); {
+                        const newMember = await inquirer.prompt(employeeType);
+                        activeEmployee = newMember.member1[0];
+                    }
+                    break;
+
+                case "intern":
+                    const intern = await inquirer.prompt(addIntern);
+                    let intern1 = new Intern(intern.name, intern.id, intern.email, intern.school);
+                    let intern1Card = renderHTML(intern1);
+                    team = team + intern1Card
+                    console.log(team);
+                    let nextMember1 = await inquirer.prompt(addMoreMembers);
+
+                    if (nextMember1.choice[0] === "false") {
+                        proceed = false;
+                        let temporaryMainFile = templateMainFile.replace('{{ team }}', team);
+                        fs.writeFileSync("index.html", temporaryMainFile);
+                    } else if (nextMember1.choice[0] === "true") {
+                        const newMember1 = await inquirer.prompt(employeeType);
+                        activeEmployee = newMember1.member1[0];
+                    }
+                    break;
+
+            }
+        } while (proceed)
+
+
+    } catch (err) {
+        console.log(err);
+    }
+}
